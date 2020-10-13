@@ -30,11 +30,27 @@ namespace NaraWebApi.Controllers
             var order = await _orderManager.MakeAnOrder(contentOrder);
             return Ok(order);
         }
+
+
         /**
          * 
          * 
          * TableController ==> get all terrasses + all resto Tables WitjhOrders
          * Get AllItems ; 
          */
+
+        [HttpGet]
+        public async Task<IActionResult> GetOrders([FromQuery(Name = "TableKeys")] IEnumerable<string> TableKeys, [FromQuery(Name = "Owners")] IEnumerable<string> Owners)
+        {
+            var output = await _orderManager.GetOrders(TableKeys, Owners);
+            return Ok(output);
+        }
+        [HttpGet("{TableKey}")]
+        public async Task<IActionResult> GetOrdersItemsForTable([FromRoute] string TableKey)
+        {
+            var output = await _orderManager.GetTableOrderItems(TableKey);
+            return Ok(output);
+        }
+
     }
 }

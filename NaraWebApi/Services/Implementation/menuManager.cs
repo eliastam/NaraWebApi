@@ -5,16 +5,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-
+using Microsoft.AspNetCore.SignalR;
+using NaraWebApi.Infrastructure;
 
 namespace NaraWebApi.Services.Implementation
 {
     public class menuManager : IMenuManager
     {
         private readonly NaraContext _db;
-        public menuManager(NaraContext db)
+        private IHubContext<SignalServer> _hubContext;
+
+        public menuManager(NaraContext db, IHubContext<SignalServer> hubContext)
         {
             _db = db;
+            _hubContext = hubContext;
         }
         #region MainMenu
 
@@ -26,6 +30,7 @@ namespace NaraWebApi.Services.Implementation
                 _db.Menu.Add(menu);
                 await _db.SaveChangesAsync();
             }
+           // _hubContext.Clients.All.SendAsync("ss");
             return menu;
         }
         public async Task<IEnumerable<Menu>> GetMenuItems(IEnumerable<string> names, IEnumerable<string> Types)

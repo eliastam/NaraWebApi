@@ -26,19 +26,19 @@ namespace NaraWebApi.Services.Implementation
 
             var baseQuery = _db.Menu.AsQueryable();
             //baseQuery = baseQuery.Where((e) => String.Equals(e.key,name, StringComparison.OrdinalIgnoreCase));
-              baseQuery = baseQuery.Where((e) => string.Equals(e.ItemName, name));
-            var entities =  await baseQuery.ToListAsync();
+            baseQuery = baseQuery.Where((e) => string.Equals(e.ItemName, name));
+            var entities = await baseQuery.ToListAsync();
             return entities.FirstOrDefault();
         }
 
-        public  async Task<ContentOrder> MakeAnOrder(ContentOrder contentOrder)
+        public async Task<ContentOrder> MakeAnOrder(ContentOrder contentOrder)
         {
-          
+
             var order = new Order
             {
                 Table = await GetTableByKey(contentOrder.Table),
                 Comments = contentOrder.Comment,
-                owner = contentOrder.Owner, 
+                owner = contentOrder.Owner,
                 OrderItems = await ConvertContentOrderItemToOrderItem(contentOrder.OrderItems)
             };
             _db.Orders.Add(order);
@@ -83,10 +83,10 @@ namespace NaraWebApi.Services.Implementation
         public async Task<ICollection<OrderItem>> ConvertContentOrderItemToOrderItem(IEnumerable<ContentOrderItem> contntOrderItems)
         {
             var output = new Collection<OrderItem>();
-           
+
             foreach (var contentOrderItem in contntOrderItems)
             {
-                var AddOns= new Collection<AddOn>();
+                var AddOns = new Collection<AddOn>();
                 if (contentOrderItem.AddOns != null)
                 {
                     foreach (var AddOn in contentOrderItem.AddOns)
@@ -97,7 +97,7 @@ namespace NaraWebApi.Services.Implementation
                 var orderItem = new OrderItem
                 {
                     comment = contentOrderItem.comment,
-                    AddOns = AddOns, 
+                    AddOns = AddOns,
                     Item = await GetMenuItemByName(contentOrderItem.ItemName),
                     quantity = contentOrderItem.quantity
 
@@ -112,14 +112,22 @@ namespace NaraWebApi.Services.Implementation
             var dico = new Dictionary<string, int>();
             foreach (var orderItem in order.OrderItems)
             {
-                
+
                 var components = orderItem.Item.components;
                 components = components.Replace(" ", "");
                 var componentswithQuantity = components.Split(",");
                 foreach (var componentwithQuantity in componentswithQuantity)
                 {
                     var nameAndQuantity = componentwithQuantity.Split(":");
-                    dico.Add(nameAndQuantity[0], orderItem.quantity * Int16.Parse(nameAndQuantity[1]));
+                    if (dico.ContainsKey(nameAndQuantity[0]))
+                    {
+                        var num = dico[nameAndQuantity[0]];
+                        dico[nameAndQuantity[0]] = num + orderItem.quantity * Int16.Parse(nameAndQuantity[1]);
+                    }
+                    else
+                    {
+                        dico.Add(nameAndQuantity[0], orderItem.quantity * Int16.Parse(nameAndQuantity[1]));
+                    }
                 }
                 foreach (var addOn in orderItem.AddOns)
                 {
@@ -138,7 +146,7 @@ namespace NaraWebApi.Services.Implementation
 
                 }
             }
-          
+
             foreach (var item in dico)
             {
                 var storage = _db.StoreItmes.AsQueryable();
@@ -146,17 +154,96 @@ namespace NaraWebApi.Services.Implementation
                 storage = storage.Where(e => e.ItemName == item.Key);
 
                 var storeItems = await storage.ToListAsync();
-               
+
                 if (storeItems != null)
                 {
                     var storeItem = storeItems.FirstOrDefault();
-               
+
                     storeItem.Quantity = storeItem.Quantity - item.Value;
                 }
             }
             await _db.SaveChangesAsync();
 
 
-        } 
+        }
+
+        public async Task<IEnumerable<ContentOrder>> GetOrders(IEnumerable<string> TableKey, IEnumerable<string> owner)
+        {
+            var baseQuery = _db.Orders
+                .Include((e) => e.OrderItems)
+                .Include((e) => e.OrderItems).ThenInclude((e) => e.Item)
+                .Include((e) => e.OrderItems).ThenInclude((e) => e.AddOns).ThenInclude((e) => e.AddOnItem)
+                .Include((e) => e.Table)
+                .AsQueryable();
+
+
+            if (TableKey.Any())
+            {
+                baseQuery = baseQuery.Where((e) => TableKey.Contains(e.Table.key));
+            }
+
+
+            var orders = await baseQuery.ToListAsync();
+            //var order = orders.FirstOrDefault();
+
+
+
+            var list = new List<ContentOrder>();
+
+            foreach (var order in orders)
+            {
+                var c = await _orderConverter.ConvertOrderToContentOrder(order);
+                list.Add(c);
+            }
+
+
+
+            return list;
+        }
+
+        public async Task<IEnumerable<ContentOrderItem>> GetTableOrderItems(string TableKey)
+        {
+            var baseQuery = _db.Orders
+                .Include((e) => e.OrderItems)
+                .Include((e) => e.OrderItems).ThenInclude((e) => e.Item)
+                .Include((e) => e.OrderItems).ThenInclude((e) => e.AddOns).ThenInclude((e) => e.AddOnItem)
+                .Include((e) => e.Table)
+                .AsQueryable();
+
+            baseQuery = baseQuery.Where((e) => TableKey.Contains(e.Table.key));
+
+
+            var orders = await baseQuery.ToListAsync();
+            //var order = orders.FirstOrDefault();
+
+
+
+            var list = new List<ContentOrderItem>();
+
+            foreach (var order in orders)
+            {
+                var c = await _orderConverter.ConvertOrderToContentOrder(order);
+                var cItems = c.OrderItems;
+                foreach (var cItem in cItems)
+                {
+                    var s = list.Where((e) => e.ItemName == cItem.ItemName && e.AddOns.ToHashSet().SetEquals(cItem.AddOns.ToHashSet()));
+                    if (s.Any())
+                    {
+                        var contentItem = s.FirstOrDefault();
+                        var oldQuantity = contentItem.quantity;
+                        contentItem.quantity = oldQuantity + cItem.quantity;
+                    }
+                    else 
+                    {
+                        list.Add(cItem); 
+                    }
+                }
+               
+            }
+
+
+
+            return list;
+        }
     }
 }

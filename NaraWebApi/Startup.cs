@@ -15,6 +15,8 @@ using Microsoft.OpenApi.Models;
 using NaraWebApi.Data;
 using NaraWebApi.Services;
 using NaraWebApi.Services.Implementation;
+using Microsoft.AspNetCore.SignalR;
+using NaraWebApi.Infrastructure;
 
 namespace NaraWebApi
 {
@@ -48,6 +50,9 @@ namespace NaraWebApi
 
                 });
             });
+
+            services.AddSignalR();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -77,7 +82,9 @@ namespace NaraWebApi
 
             app.UseRouting();
 
-           
+            app.UseSignalR(route => {
+                route.MapHub<SignalServer>("/signalServer");
+            });
 
             app.UseEndpoints(endpoints =>
             {

@@ -11,5 +11,7 @@ namespace NaraWebApi.Services
     {
          Task<ContentOrder> MakeAnOrder(ContentOrder contentOrder);
          Task<Menu> GetMenuItem(string name);
+         Task<IEnumerable<ContentOrder>> GetOrders(IEnumerable<string> TableKey, IEnumerable<string> owner);
+        Task<IEnumerable<ContentOrderItem>> GetTableOrderItems(string TableKey);
     }
 }
