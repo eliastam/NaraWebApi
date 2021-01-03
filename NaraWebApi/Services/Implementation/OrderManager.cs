@@ -233,17 +233,106 @@ namespace NaraWebApi.Services.Implementation
                         var oldQuantity = contentItem.quantity;
                         contentItem.quantity = oldQuantity + cItem.quantity;
                     }
-                    else 
+                    else
                     {
-                        list.Add(cItem); 
+                        list.Add(cItem);
                     }
                 }
-               
+
             }
 
 
 
             return list;
         }
+
+        public async Task pay(string tableKey, ContentOrderItem contentOrderItem, int quantity)
+        {
+            var baseQuery = _db.Orders
+               .Include((e) => e.OrderItems)
+               .Include((e) => e.OrderItems).ThenInclude((e) => e.Item)
+               .Include((e) => e.OrderItems).ThenInclude((e) => e.AddOns).ThenInclude((e) => e.AddOnItem)
+               .Include((e) => e.Table)
+               .AsQueryable();
+
+            baseQuery = baseQuery.Where((e) => e.Table.key == tableKey);
+            var orders = await baseQuery.ToListAsync();
+
+            var list = new List<OrderItem>();
+
+            foreach (var order in orders)
+            {
+
+                foreach (var orderItem in order.OrderItems)
+                {
+                    if (orderItem.Item.ItemName == contentOrderItem.ItemName &&
+                       orderItem.Paid == contentOrderItem.Paid &&
+                       orderItem.AddOns.Select((e) => e.AddOnItem.ItemName).ToHashSet().SetEquals(contentOrderItem.AddOns.ToHashSet())
+                       )
+                    {
+                        list.Add(orderItem);
+                    }
+                }
+            }
+            var listIterator = 0;
+            for (int i = 0; i < quantity; i++)
+            {
+                if (list[listIterator].quantity > 1)
+                {
+                    list[listIterator].quantity = list[listIterator].quantity - 1;
+                }
+                else
+                {
+                    _db.OrderItems.Remove(list[listIterator]);
+                    listIterator++;
+                }
+               
+
+            }
+            await _db.SaveChangesAsync();
+            if (list.Any())
+            {
+                await AddOrderItemToArchive(list.FirstOrDefault(), quantity);
+            }
+        }
+
+        public async Task<Archive> AddOrderItemToArchive(OrderItem orderItem, int quantity)
+        {
+            var time = (DateTime.Now - TimeSpan.FromHours(3));
+            var date = $"{time.Day}/{time.Month}/{time.Year}";
+            var baseQuery = _db.Archive.AsQueryable();
+
+            baseQuery = baseQuery.Where((e) => e.Date == date && e.ItemName == orderItem.Item.ItemName);
+
+            var list = await baseQuery.ToListAsync();
+            var archive = list.FirstOrDefault();
+
+            if (archive == null)
+            {
+                 archive = new Archive
+                {
+
+                    Date = date,
+                    Day = time.DayOfWeek.ToString(),
+                    ItemName = orderItem.Item.ItemName,
+                    ItemType = orderItem.Item.Type,
+                    Quantity = quantity
+
+                };
+                await _db.Archive.AddAsync(archive);
+              
+
+            }
+            else {
+                archive.Quantity = archive.Quantity + quantity;
+
+            }
+
+            await _db.SaveChangesAsync();
+
+
+            return archive;
+        }
+
     }
 }

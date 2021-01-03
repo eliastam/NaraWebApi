@@ -52,5 +52,13 @@ namespace NaraWebApi.Controllers
             return Ok(output);
         }
 
+        [HttpPost("{TableKey}/{Quantity}")]
+
+        public async Task<IActionResult> pay ([FromRoute] string TableKey, [FromBody]  ContentOrderItem contentOrderItem, [FromRoute] int Quantity)
+        {
+            await _orderManager.pay(TableKey, contentOrderItem, Quantity);
+            return Ok();
+        }
+
     }
 }

@@ -9,6 +9,16 @@
     <Compile Remove="Migrations\20200906214751_initia.Designer.cs" />
     <Compile Remove="Migrations\20200906214849_AddQuantity.cs" />
     <Compile Remove="Migrations\20200906214849_AddQuantity.Designer.cs" />
+    <Compile Remove="Migrations\20200906214956_initia.cs" />
+    <Compile Remove="Migrations\20200906214956_initia.Designer.cs" />
+    <Compile Remove="Migrations\20201013013046_payment.cs" />
+    <Compile Remove="Migrations\20201013013046_payment.Designer.cs" />
+    <Compile Remove="Migrations\20201013013435_initia.cs" />
+    <Compile Remove="Migrations\20201013013435_initia.Designer.cs" />
+    <Compile Remove="Migrations\20201013020903_archive.cs" />
+    <Compile Remove="Migrations\20201013020903_archive.Designer.cs" />
+    <Compile Remove="Migrations\20201013021039_archive.cs" />
+    <Compile Remove="Migrations\20201013021039_archive.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

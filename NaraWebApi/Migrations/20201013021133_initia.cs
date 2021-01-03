@@ -26,6 +26,24 @@ namespace NaraWebApi.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Archive",
+                schema: "Nara",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Date = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Day = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ItemName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ItemType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Quantity = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Archive", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Menu",
                 schema: "Nara",
                 columns: table => new
@@ -105,6 +123,7 @@ namespace NaraWebApi.Migrations
                     ItemId = table.Column<int>(type: "int", nullable: true),
                     OrderId = table.Column<int>(type: "int", nullable: true),
                     comment = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Paid = table.Column<int>(type: "int", nullable: false),
                     quantity = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -192,6 +211,10 @@ namespace NaraWebApi.Migrations
         {
             migrationBuilder.DropTable(
                 name: "AddOns",
+                schema: "Nara");
+
+            migrationBuilder.DropTable(
+                name: "Archive",
                 schema: "Nara");
 
             migrationBuilder.DropTable(

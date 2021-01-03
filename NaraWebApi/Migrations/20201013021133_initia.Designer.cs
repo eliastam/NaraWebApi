@@ -10,7 +10,7 @@ using NaraWebApi.Data;
 namespace NaraWebApi.Migrations
 {
     [DbContext(typeof(NaraContext))]
-    [Migration("20200906214956_initia")]
+    [Migration("20201013021133_initia")]
     partial class initia
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -71,6 +71,33 @@ namespace NaraWebApi.Migrations
                     b.ToTable("AddOnsMenu");
                 });
 
+            modelBuilder.Entity("NaraWebApi.Data.Entities.Archive", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
+                    b.Property<string>("Date")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Day")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ItemName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ItemType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Archive");
+                });
+
             modelBuilder.Entity("NaraWebApi.Data.Entities.Menu", b =>
                 {
                     b.Property<int>("Id")
@@ -129,6 +156,9 @@ namespace NaraWebApi.Migrations
                         .HasColumnType("int");
 
                     b.Property<int?>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Paid")
                         .HasColumnType("int");
 
                     b.Property<string>("comment")

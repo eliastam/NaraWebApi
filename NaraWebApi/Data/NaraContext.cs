@@ -16,7 +16,7 @@ namespace NaraWebApi.Data
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<Menu> Menu { get; set; }
-        //public DbSet<Archive> Archive { get; set; }
+        public DbSet<Archive> Archive { get; set; }
         public DbSet<Table> Tables { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

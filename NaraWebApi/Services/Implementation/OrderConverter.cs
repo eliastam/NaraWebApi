@@ -43,7 +43,8 @@ namespace NaraWebApi.Services.Implementation
                     AddOns = AddOnNames,
                     comment = orderItem.comment,
                     ItemName = orderItem.Item.ItemName,
-                    quantity = orderItem.quantity
+                    quantity = orderItem.quantity,
+                    Paid     = orderItem.Paid
                 };
 
                 output.Add(contentOrderItem);

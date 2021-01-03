@@ -14,5 +14,7 @@ namespace NaraWebApi.DTO
         public string comment { get; set; }
 
         public int quantity { get; set; }
+
+        public int Paid { get; set; }
     }
 }

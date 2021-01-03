@@ -17,7 +17,7 @@ namespace NaraWebApi.Data.Entities
 
         public string comment { get; set; }
 
-       
+        public int Paid { get; set; }
 
         public int  quantity { get; set; }
     }

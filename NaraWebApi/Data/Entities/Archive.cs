@@ -9,8 +9,14 @@ namespace NaraWebApi.Data.Entities
     {
         public int Id { get; set; }
 
-        public DateTime Date { get; set; } 
+        public string Date { get; set; } 
 
+        public string Day { get; set; }
         
+        public string ItemName { get; set; }
+        
+        public string ItemType { get; set; }
+        public int Quantity { get; set; }
+
     }
 }
