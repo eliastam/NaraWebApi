@@ -10,7 +10,7 @@ using NaraWebApi.Data;
 namespace NaraWebApi.Migrations
 {
     [DbContext(typeof(NaraContext))]
-    [Migration("20201013021133_initia")]
+    [Migration("20210104055223_initia")]
     partial class initia
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

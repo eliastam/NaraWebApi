@@ -241,8 +241,6 @@ namespace NaraWebApi.Services.Implementation
 
             }
 
-
-
             return list;
         }
 
@@ -265,9 +263,16 @@ namespace NaraWebApi.Services.Implementation
 
                 foreach (var orderItem in order.OrderItems)
                 {
+
                     if (orderItem.Item.ItemName == contentOrderItem.ItemName &&
                        orderItem.Paid == contentOrderItem.Paid &&
-                       orderItem.AddOns.Select((e) => e.AddOnItem.ItemName).ToHashSet().SetEquals(contentOrderItem.AddOns.ToHashSet())
+                       (orderItem.AddOns.Count ==0 ||
+                       orderItem.AddOns
+                       .Select((e) => e.AddOnItem.ItemName)
+                       .ToHashSet()
+                       .SetEquals(contentOrderItem.AddOns.ToHashSet())
+                       )
+
                        )
                     {
                         list.Add(orderItem);

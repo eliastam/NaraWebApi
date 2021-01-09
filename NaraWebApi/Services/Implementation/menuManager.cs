@@ -6,19 +6,19 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.SignalR;
-using NaraWebApi.Infrastructure;
+
 
 namespace NaraWebApi.Services.Implementation
 {
     public class menuManager : IMenuManager
     {
         private readonly NaraContext _db;
-        private IHubContext<SignalServer> _hubContext;
+       
 
-        public menuManager(NaraContext db, IHubContext<SignalServer> hubContext)
+        public menuManager(NaraContext db )
         {
             _db = db;
-            _hubContext = hubContext;
+       
         }
         #region MainMenu
 
